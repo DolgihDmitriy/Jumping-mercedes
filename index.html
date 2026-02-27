@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maybach GLS 600 - Premium</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #e4e7eb, #f8f9fa); 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #222222;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    /* --- СТИЛИ ЭКРАНА ЗАГРУЗКИ --- */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #111; /* Темный фон для контраста */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999; /* Поверх всего сайта */
+      color: #fff;
+      transition: opacity 0.8s ease-in-out; /* Плавное исчезновение */
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: #ffffff; /* Белое вращающееся кольцо */
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-weight: 300;
+      letter-spacing: 3px;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .loading-progress {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    /* ------------------------------ */
+
+    .header {
+      position: absolute;
+      top: 40px;
+      text-align: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    h1 { margin: 0; font-weight: 300; letter-spacing: 2px; }
+    p { color: #555555; font-size: 14px; margin-top: 5px; }
+
+    .color-controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      pointer-events: auto;
+    }
+
+    .color-btn {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .color-btn:hover { 
+      transform: scale(1.15); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .color-white { background-color: #ffffff; }
+    .color-black { background-color: #1a1a1a; border-color: #444; }
+    .color-emerald { background-color: #0e2b20; border-color: #0e2b20; }
+    .color-gold { background-color: #c5a059; border-color: #c5a059; }
+    .color-rubellite { background-color: #4a1823; border-color: #4a1823; }
+    .color-ocean { background-color: #111d36; border-color: #111d36; }
+
+    .showroom {
+      width: 90vw;
+      height: 70vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @keyframes maybach-bounce {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-25px); }
+      100% { transform: translateY(0); }
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+      outline: none;
+      transition: transform 0.3s;
+    }
+
+    model-viewer.is-bouncing {
+      animation: maybach-bounce 0.8s ease-in-out infinite;
+      cursor: grab;
+    }
+
+    model-viewer:active { cursor: grabbing; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <div class="loading-text">ПОДГОТОВКА MAYBACH GLS 600...</div>
+    <div class="loading-progress" id="progress-percent">0%</div>
+  </div>
+
+  <div class="header">
+    <h1>MERCEDES-MAYBACH GLS 600</h1>
+    <p>Наведи курсор точно на кузов для активации подвески и музыки. Тяни для вращения.Чтобы музыка заиграла кликни в любое место экрана</p>
+    
+    <div class="color-controls">
+      <button class="color-btn color-white" data-color="#ffffff" title="Белый"></button>
+      <button class="color-btn color-black" data-color="#1a1a1a" title="Черный"></button>
+      <button class="color-btn color-emerald" data-color="#0e2b20" title="Изумрудный (Emerald Green)"></button>
+      <button class="color-btn color-gold" data-color="#c5a059" title="Золотой (Kalahari Gold)"></button>
+      <button class="color-btn color-rubellite" data-color="#4a1823" title="Винный (Rubellite Red)"></button>
+      <button class="color-btn color-ocean" data-color="#111d36" title="Глубокий синий (Nautical Blue)"></button>
+    </div>
+  </div>
+
+  <div class="showroom">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+    
+    <model-viewer 
+      id="my-maybach"
+      src="maybach.glb" 
+      alt="3D модель Mercedes-Maybach GLS 600" 
+      camera-controls 
+      auto-rotate 
+      shadow-intensity="1.5"
+      shadow-softness="1"
+      exposure="1.0">
+    </model-viewer>
+  </div>
+
+  <audio id="bounce-audio" src="music.mp3" loop></audio>
+
+  <script>
+    const model = document.querySelector('#my-maybach');
+    const audio = document.querySelector('#bounce-audio');
+    const colorButtons = document.querySelectorAll('.color-btn');
+    
+    // Элементы экрана загрузки
+    const loadingScreen = document.getElementById('loading-screen');
+    const progressPercent = document.getElementById('progress-percent');
+
+    // --- ЛОГИКА ЭКРАНА ЗАГРУЗКИ ---
+    // Отслеживаем прогресс загрузки модели в процентах
+    model.addEventListener('progress', (event) => {
+      const percent = Math.round(event.detail.totalProgress * 100);
+      progressPercent.textContent = `${percent}%`;
+    });
+
+    // Когда модель полностью загружена (100%), плавно скрываем экран
+    model.addEventListener('load', () => {
+      loadingScreen.style.opacity = '0'; // Запускаем CSS анимацию исчезновения
+      
+      // Полностью удаляем экран через 0.8 секунд, чтобы он не перекрывал клики
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+      }, 800);
+    });
+
+    // --- ТОЧНОЕ НАВЕДЕНИЕ (ПРЫЖКИ + МУЗЫКА) ---
+    model.addEventListener('mousemove', (event) => {
+      const hit = model.positionAndNormalFromPoint(event.clientX, event.clientY);
+      
+      if (hit != null) {
+        model.classList.add('is-bouncing');
+        if (audio.paused) {
+          audio.play().catch(() => {}); 
+        }
+      } else {
+        model.classList.remove('is-bouncing');
+        audio.pause();
+      }
+    });
+
+    model.addEventListener('mouseleave', () => {
+      model.classList.remove('is-bouncing');
+      audio.pause();
+    });
+
+    // --- ПОКРАСКА (ИНДЕКСЫ 15, 20, 50) ---
+    colorButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const hexString = e.target.getAttribute('data-color');
+        
+        if (model.model && model.model.materials) {
+          const paintIndexes = [15, 20, 50]; 
+          
+          paintIndexes.forEach(index => {
+            const material = model.model.materials[index]; 
+            if (material) {
+              material.pbrMetallicRoughness.setBaseColorFactor(hexString);
+            }
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
